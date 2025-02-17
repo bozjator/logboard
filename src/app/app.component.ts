@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { DialogService } from './shared/dialogs/base/dialog.service';
+import { AddMonitoringEndpointDialog } from './shared/dialogs/add-monitoring-endpoint.dialog';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'logboard';
+  private dialogService = inject(DialogService);
+
+  openAddMonitoringEndpointDialog() {
+    this.dialogService.open(AddMonitoringEndpointDialog);
+  }
 }
