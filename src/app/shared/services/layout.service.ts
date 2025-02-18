@@ -6,12 +6,11 @@ export class LayoutService {
   readonly isDarkMode = signal(false);
 
   constructor() {
+    this.setupSyncThemeModeWithStorageAndBody();
     this.initIsDarkMode();
-    this.setupEffects();
   }
 
-  private setupEffects() {
-    // Set isDarkMode signal effect.
+  private setupSyncThemeModeWithStorageAndBody() {
     effect(() => {
       window.localStorage.setItem(
         APP_STORAGE_NAMES.isDarkMode,
@@ -27,7 +26,6 @@ export class LayoutService {
         window.matchMedia('(prefers-color-scheme: dark)').matches.toString(),
     );
     this.isDarkMode.set(isDarkMode);
-    this.setThemeClassOnBody();
   }
 
   private setThemeClassOnBody(): void {
