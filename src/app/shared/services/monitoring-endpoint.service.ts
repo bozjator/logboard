@@ -1,37 +1,58 @@
-import { effect, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal } from '@angular/core';
 import { APP_STORAGE_NAMES } from '../models/app-storage-name.enum';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({ providedIn: 'root' })
 export class MonitoringEndpointService {
-  readonly monitoringEndpoints = signal<MonitoringEndpoint[]>([]);
+  private encryptionService = inject(EncryptionService);
+
+  readonly monitoringEndpoints = signal<MonitoringEndpoint[] | undefined>(
+    undefined,
+  );
   readonly currentEndpoint = signal<MonitoringEndpoint | undefined>(undefined);
 
+  private password = 'string1234'; // TODO get it from user.
+
   constructor() {
-    this.initMonitoringPoints();
-    this.setCurrentEndpoint();
-    this.setupEffects();
+    this.readEndpointsFromStorage();
+    this.listenToStoreEndpoints();
   }
 
-  private setupEffects() {
-    // Set monitoringEndpoints signal effect.
-    effect(() => {
+  private listenToStoreEndpoints() {
+    effect(async () => {
+      const endpoints = this.monitoringEndpoints();
+      if (!endpoints) return;
+      const endpointsAsString = JSON.stringify(endpoints);
+      const encryptedData = await this.encryptionService.encryptData(
+        endpointsAsString,
+        this.password,
+      );
       window.localStorage.setItem(
         APP_STORAGE_NAMES.monitoringEndpoints,
-        JSON.stringify(this.monitoringEndpoints()),
+        JSON.stringify(encryptedData),
       );
     });
   }
 
-  private initMonitoringPoints() {
-    const endpoints: MonitoringEndpoint[] = JSON.parse(
-      window.localStorage.getItem(APP_STORAGE_NAMES.monitoringEndpoints) ??
-        '[]',
+  private async readEndpointsFromStorage() {
+    const encryptedDataString = window.localStorage.getItem(
+      APP_STORAGE_NAMES.monitoringEndpoints,
     );
-    this.monitoringEndpoints.set(endpoints);
-  }
+    if (!encryptedDataString) return;
 
-  private setCurrentEndpoint() {
-    this.currentEndpoint.set(this.monitoringEndpoints()[0]);
+    const encryptedData = JSON.parse(encryptedDataString);
+
+    try {
+      const decryptedData: string = await this.encryptionService.decryptData(
+        encryptedData,
+        this.password,
+      );
+      const endpoints: MonitoringEndpoint[] = JSON.parse(decryptedData ?? '[]');
+      this.monitoringEndpoints.set(endpoints);
+    } catch (error) {
+      console.error(error);
+      // TODO handle decryption failure - ask again for password or offer to clear data.
+    }
   }
 }

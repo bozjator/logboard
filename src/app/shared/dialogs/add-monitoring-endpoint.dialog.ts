@@ -133,10 +133,9 @@ export class AddMonitoringEndpointDialog {
   addMonitoringEndpoint() {
     if (!this.monitoringEndpointForm.valid) return;
     const newEndpoint = this.monitoringEndpointForm.value as MonitoringEndpoint;
-    const endpoints = [
-      ...this.monitoringEndpointService.monitoringEndpoints(),
-      newEndpoint,
-    ];
+    const existingEndpoints =
+      this.monitoringEndpointService.monitoringEndpoints() ?? [];
+    const endpoints = [...existingEndpoints, newEndpoint];
     this.monitoringEndpointService.monitoringEndpoints.set(endpoints);
     this.dialogClose.emit();
   }

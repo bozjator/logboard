@@ -80,10 +80,12 @@ export class MainToolbarComponent {
   layoutService = inject(LayoutService);
 
   dropdownItemsMonitorEndpoints = computed(() =>
-    this.monitoringEndpointService.monitoringEndpoints().map((endpoint) => ({
-      label: endpoint.name,
-      value: endpoint,
-    })),
+    (this.monitoringEndpointService.monitoringEndpoints() ?? []).map(
+      (endpoint) => ({
+        label: endpoint.name,
+        value: endpoint,
+      }),
+    ),
   );
 
   selectedDropdownItemMonitorEndpoint: WritableSignal<
