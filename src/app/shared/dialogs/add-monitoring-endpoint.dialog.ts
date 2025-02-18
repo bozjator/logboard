@@ -13,6 +13,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { DialogComponent } from './base/dialog.component';
+import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
+import { MonitoringEndpointService } from '../services/monitoring-endpoint.service';
 
 interface MonitoringEndpointForm {
   name: FormControl<string | null>;
@@ -97,10 +99,10 @@ interface MonitoringEndpointForm {
       </ng-container>
     </app-dialog>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddMonitoringEndpointDialog {
   private formBuilder = inject(FormBuilder);
+  private monitoringEndpointService = inject(MonitoringEndpointService);
 
   dialogClose = output<void>();
 
@@ -120,7 +122,12 @@ export class AddMonitoringEndpointDialog {
 
   addMonitoringEndpoint() {
     if (!this.monitoringEndpointForm.valid) return;
-    const values = this.monitoringEndpointForm.value;
-    console.log('TODO addMonitoringEndpoint', values);
+    const newEndpoint = this.monitoringEndpointForm.value as MonitoringEndpoint;
+    const endpoints = [
+      ...this.monitoringEndpointService.monitoringEndpoints(),
+      newEndpoint,
+    ];
+    this.monitoringEndpointService.monitoringEndpoints.set(endpoints);
+    this.dialogClose.emit();
   }
 }
