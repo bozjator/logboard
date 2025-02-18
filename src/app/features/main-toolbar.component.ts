@@ -88,13 +88,23 @@ export class MainToolbarComponent {
 
   selectedDropdownItemMonitorEndpoint: WritableSignal<
     DropdownItem<MonitoringEndpoint> | undefined
-  > = signal(this.dropdownItemsMonitorEndpoints()[0]);
+  > = signal(undefined);
 
   constructor() {
+    this.setupEndpointDropdownSelection();
+  }
+
+  private setupEndpointDropdownSelection() {
+    // Set dropdown selection to first item when dropdown items change.
     effect(() => {
-      this.monitoringEndpointService.currentEndpoint.set(
-        this.selectedDropdownItemMonitorEndpoint()?.value,
-      );
+      const dropdownItem = this.dropdownItemsMonitorEndpoints()[0];
+      this.selectedDropdownItemMonitorEndpoint.set(dropdownItem);
+    });
+
+    // Set current endpoint when dropdown items is selected.
+    effect(() => {
+      const endpoint = this.selectedDropdownItemMonitorEndpoint()?.value;
+      this.monitoringEndpointService.currentEndpoint.set(endpoint);
     });
   }
 

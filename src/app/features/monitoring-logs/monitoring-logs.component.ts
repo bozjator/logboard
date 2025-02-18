@@ -61,7 +61,8 @@ export class MonitoringLogsComponent {
 
   private onEndpointChange() {
     effect(() => {
-      this.monitoringEndpointService.currentEndpoint();
+      const currentEndpoint = this.monitoringEndpointService.currentEndpoint();
+      if (!currentEndpoint) return;
       this.getLogs();
     });
   }
@@ -75,6 +76,7 @@ export class MonitoringLogsComponent {
       .subscribe({
         next: (logs) => this.logs.set(logs),
         error: (error) => {
+          console.error(error);
           // TODO: Handle error.
         },
       });
