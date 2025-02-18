@@ -10,6 +10,7 @@ import { MonitoringLogList } from '../../shared/models/monitoring-log-list.dto';
 import { MonitoringEndpointService } from '../../shared/services/monitoring-endpoint.service';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 import { PaginationQuery } from '../../shared/models/pagination.model';
+import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
 
 @Component({
   selector: 'app-monitoring-logs',
@@ -32,9 +33,21 @@ export class MonitoringLogsComponent {
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
+  private tablePageItemsStorage = {
+    set: (pageItems: number) =>
+      window.localStorage.setItem(
+        APP_STORAGE_NAMES.tablePageItems,
+        pageItems + '',
+      ),
+    get: () =>
+      Number(
+        window.localStorage.getItem(APP_STORAGE_NAMES.tablePageItems) ?? '10',
+      ),
+  };
+
   private logsQueryDefault: LogsQuery = {
     pageNumber: 1,
-    pageItems: 10,
+    pageItems: this.tablePageItemsStorage.get(),
     sortOrder: SortOrder.asc,
     sortColumn: LogSortColumn.createdAt,
   };
@@ -79,6 +92,7 @@ export class MonitoringLogsComponent {
 
   onPageItemsChange(pageItems: number): void {
     this.updatePagination({ pageNumber: 1, pageItems });
+    this.tablePageItemsStorage.set(pageItems);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
