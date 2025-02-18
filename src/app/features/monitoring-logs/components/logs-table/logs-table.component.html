@@ -1,22 +1,24 @@
-<div class="m-2 mt-8 flow-root bg-white p-2">
+<div class="m-2 mt-8 flow-root bg-white p-2 dark:bg-zinc-800">
   <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-      <table class="w-full divide-y divide-gray-300">
+      <table class="w-full divide-y divide-gray-300 dark:divide-gray-700">
         <thead>
-          <tr class="divide-x divide-gray-200">
+          <tr class="divide-x divide-gray-200 dark:divide-gray-700">
             @for (entry of logsItems()?.[0] ?? []; track $index) {
               <th
                 scope="col"
-                class="max-w-20 py-3.5 pr-4 pl-4 text-left text-sm font-semibold text-gray-900"
+                class="max-w-20 py-3.5 pr-4 pl-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-400"
               >
                 {{ entry[0] | camelCaseToTitle }}
               </th>
             }
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
+        <tbody
+          class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-zinc-800"
+        >
           @for (logItem of logsItems(); track $index) {
-            <tr class="divide-x divide-gray-200">
+            <tr class="divide-x divide-gray-200 dark:divide-gray-700">
               @for (entry of logItem; track $index) {
                 <td
                   [title]="entry[1]"
