@@ -1,4 +1,10 @@
-import { Component, inject, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MainToolbarComponent } from './features/main-toolbar.component';
 import { DropdownComponent } from './shared/components/dropdown.component';
@@ -21,12 +27,14 @@ import { MonitoringLogsComponent } from './features/monitoring-logs/monitoring-l
 export class AppComponent {
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
-  dropdownItemsMonitorEndpoints: DropdownItem<MonitoringEndpoint>[] =
+  dropdownItemsMonitorEndpoints = computed(() =>
     this.monitoringEndpointService.monitoringEndpoints().map((endpoint) => ({
       label: `${endpoint.name} - ${endpoint.url}`,
       value: endpoint,
-    }));
+    })),
+  );
+
   selectedDropdownItemMonitorEndpoint: WritableSignal<
     DropdownItem<MonitoringEndpoint> | undefined
-  > = signal(this.dropdownItemsMonitorEndpoints[0]);
+  > = signal(this.dropdownItemsMonitorEndpoints()[0]);
 }
