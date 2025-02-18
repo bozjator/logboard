@@ -1,11 +1,11 @@
 <div
-  class="flex items-center justify-between border-t px-3 py-2 dark:border-zinc-600"
+  class="flex items-center justify-between border-t border-neutral-300 px-3 py-2 dark:border-zinc-600"
 >
   <!-- MOBILE VIEW -->
   <div class="flex flex-1 justify-between sm:hidden">
     <a
       (click)="onPreviousPage()"
-      class="relative inline-flex cursor-pointer select-none items-center rounded-md border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-slate-200 dark:text-gray-300 dark:hover:bg-zinc-700"
+      class="relative inline-flex cursor-pointer items-center rounded-md border px-4 py-2 text-sm font-medium text-gray-700 select-none hover:bg-slate-200 dark:text-gray-300 dark:hover:bg-zinc-700"
     >
       Previous
     </a>
@@ -18,7 +18,7 @@
     </p>
     <a
       (click)="onNextPage()"
-      class="relative inline-flex cursor-pointer select-none items-center rounded-md border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-slate-200 dark:text-gray-300 dark:hover:bg-zinc-700"
+      class="relative inline-flex cursor-pointer items-center rounded-md border px-4 py-2 text-sm font-medium text-gray-700 select-none hover:bg-slate-200 dark:text-gray-300 dark:hover:bg-zinc-700"
     >
       Next
     </a>
@@ -111,7 +111,7 @@
         </svg>
       </button>
       <div
-        class="absolute bottom-7 right-0 z-20 w-40"
+        class="absolute right-0 bottom-7 z-20 w-40"
         [ngClass]="{
           hidden: !showDropdownItemsPerPage(),
           block: showDropdownItemsPerPage(),

@@ -1,9 +1,9 @@
-<div class="m-2 mt-8 flow-root bg-white p-2 dark:bg-zinc-800">
+<div class="m-2 mt-8 flow-root bg-white p-2 dark:bg-neutral-800">
   <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-      <table class="w-full divide-y divide-gray-300 dark:divide-gray-700">
+      <table class="w-full divide-y divide-gray-300 dark:divide-neutral-700">
         <thead>
-          <tr class="divide-x divide-gray-200 dark:divide-gray-700">
+          <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
             @for (entry of logsItems()?.[0] ?? []; track $index) {
               <th
                 scope="col"
@@ -15,14 +15,14 @@
           </tr>
         </thead>
         <tbody
-          class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-zinc-800"
+          class="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-zinc-700"
         >
           @for (logItem of logsItems(); track $index) {
-            <tr class="divide-x divide-gray-200 dark:divide-gray-700">
+            <tr class="divide-x divide-gray-200 dark:divide-gray-600">
               @for (entry of logItem; track $index) {
                 <td
                   [title]="entry[1]"
-                  class="max-w-20 p-4 text-xs break-words text-gray-500"
+                  class="max-w-20 p-4 text-xs break-words text-gray-600 dark:text-gray-400"
                   [ngClass]="{
                     truncate: [
                       'errorStack',

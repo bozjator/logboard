@@ -10,7 +10,7 @@ import { DropdownItem } from '../models/dropdown-item.model';
       <div>
         <button
           type="button"
-          class="inline-flex w-full items-center justify-between rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset hover:bg-gray-50"
+          class="inline-flex w-full cursor-pointer items-center justify-between rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset hover:bg-gray-50 dark:bg-gray-600 dark:text-gray-300 hover:dark:bg-gray-500"
           (click)="toggleDropdown()"
         >
           <span class="mx-auto">{{ selectedItem()?.label }}</span>
