@@ -5,7 +5,7 @@ import { DropdownComponent } from './shared/components/dropdown.component';
 import { DropdownItem } from './shared/models/dropdown-item.model';
 import { MonitoringEndpoint } from './shared/models/monitoring-endpoint.model';
 import { MonitoringEndpointService } from './shared/services/monitoring-endpoint.service';
-import { LogsComponent } from './features/logs/logs.component';
+import { MonitoringLogsComponent } from './features/monitoring-logs/monitoring-logs.component';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ import { LogsComponent } from './features/logs/logs.component';
     RouterOutlet,
     DropdownComponent,
     MainToolbarComponent,
-    LogsComponent,
+    MonitoringLogsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',

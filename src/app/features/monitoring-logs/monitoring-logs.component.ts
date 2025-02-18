@@ -5,11 +5,11 @@ import { SortOrder } from '../../shared/models/sort-order.enum';
 import { LogSortColumn, LogsQuery } from '../../shared/models/logs-query.model';
 
 @Component({
-  selector: 'logs',
+  selector: 'app-monitoring-logs',
   imports: [],
   template: ``,
 })
-export class LogsComponent {
+export class MonitoringLogsComponent {
   private apiMonitoringService = inject(ApiMonitoringService);
 
   endpoint = input<MonitoringEndpoint>();
