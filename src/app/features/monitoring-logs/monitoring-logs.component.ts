@@ -5,6 +5,7 @@ import { SortOrder } from '../../shared/models/sort-order.enum';
 import { LogSortColumn, LogsQuery } from '../../shared/models/logs-query.model';
 import { LogsTableComponent } from './components/logs-table/logs-table.component';
 import { MonitoringLogList } from '../../shared/models/monitoring-log-list.dto';
+import { MonitoringEndpointService } from '../../shared/services/monitoring-endpoint.service';
 
 @Component({
   selector: 'app-monitoring-logs',
@@ -13,8 +14,7 @@ import { MonitoringLogList } from '../../shared/models/monitoring-log-list.dto';
 })
 export class MonitoringLogsComponent {
   private apiMonitoringService = inject(ApiMonitoringService);
-
-  endpoint = input<MonitoringEndpoint>();
+  private monitoringEndpointService = inject(MonitoringEndpointService);
 
   private logsQueryDefault: LogsQuery = {
     pageNumber: 1,
@@ -27,15 +27,12 @@ export class MonitoringLogsComponent {
   logs = signal<MonitoringLogList | undefined>(undefined);
 
   constructor() {
-    this.listenInputChangeEndpoint();
+    this.onEndpointChange();
   }
 
-  private listenInputChangeEndpoint() {
+  private onEndpointChange() {
     effect(() => {
-      const endpoint = this.endpoint();
-      if (!endpoint) return;
-      this.logsQuery = { ...this.logsQueryDefault };
-      this.apiMonitoringService.setEndpoint(endpoint);
+      this.monitoringEndpointService.currentEndpoint();
       this.getLogs();
     });
   }

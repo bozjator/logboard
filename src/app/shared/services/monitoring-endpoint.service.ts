@@ -5,9 +5,11 @@ import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 @Injectable({ providedIn: 'root' })
 export class MonitoringEndpointService {
   readonly monitoringEndpoints = signal<MonitoringEndpoint[]>([]);
+  readonly currentEndpoint = signal<MonitoringEndpoint | undefined>(undefined);
 
   constructor() {
     this.initMonitoringPoints();
+    this.setCurrentEndpoint();
     this.setupEffects();
   }
 
@@ -27,5 +29,9 @@ export class MonitoringEndpointService {
         '[]',
     );
     this.monitoringEndpoints.set(endpoints);
+  }
+
+  private setCurrentEndpoint() {
+    this.currentEndpoint.set(this.monitoringEndpoints()[0]);
   }
 }
