@@ -1,13 +1,15 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { MonitoringEndpoint } from '../../shared/models/monitoring-endpoint.model';
 import { ApiMonitoringService } from '../../shared/services/api-monitoring.service';
 import { SortOrder } from '../../shared/models/sort-order.enum';
 import { LogSortColumn, LogsQuery } from '../../shared/models/logs-query.model';
+import { LogsTableComponent } from './components/logs-table/logs-table.component';
+import { MonitoringLogList } from '../../shared/models/monitoring-log-list.dto';
 
 @Component({
   selector: 'app-monitoring-logs',
-  imports: [],
-  template: ``,
+  imports: [LogsTableComponent],
+  template: ` <app-logs-table [logs]="logs()" /> `,
 })
 export class MonitoringLogsComponent {
   private apiMonitoringService = inject(ApiMonitoringService);
@@ -21,6 +23,8 @@ export class MonitoringLogsComponent {
     sortColumn: LogSortColumn.createdAt,
   };
   private logsQuery: LogsQuery = { ...this.logsQueryDefault };
+
+  logs = signal<MonitoringLogList | undefined>(undefined);
 
   constructor() {
     this.listenInputChangeEndpoint();
@@ -38,8 +42,9 @@ export class MonitoringLogsComponent {
 
   private getLogs() {
     this.apiMonitoringService.getLogs(this.logsQuery).subscribe({
-      next: (logs) => {
-        console.log(logs);
+      next: (logs) => this.logs.set(logs),
+      error: (error) => {
+        // TODO handle error.
       },
     });
   }
