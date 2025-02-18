@@ -20,6 +20,7 @@ interface MonitoringEndpointForm {
   name: FormControl<string | null>;
   url: FormControl<string | null>;
   key: FormControl<string | null>;
+  keyHeaderName: FormControl<string | null>;
 }
 
 @Component({
@@ -62,15 +63,15 @@ interface MonitoringEndpointForm {
               formControlName: 'name',
               formGroup: monitoringEndpointForm,
             }"
-          ></ng-template>
+          />
           <ng-template
             [ngTemplateOutlet]="inputField"
             [ngTemplateOutletContext]="{
-              label: 'URL',
+              label: 'API base URL',
               formControlName: 'url',
               formGroup: monitoringEndpointForm,
             }"
-          ></ng-template>
+          />
           <ng-template
             [ngTemplateOutlet]="inputField"
             [ngTemplateOutletContext]="{
@@ -78,7 +79,15 @@ interface MonitoringEndpointForm {
               formControlName: 'key',
               formGroup: monitoringEndpointForm,
             }"
-          ></ng-template>
+          />
+          <ng-template
+            [ngTemplateOutlet]="inputField"
+            [ngTemplateOutletContext]="{
+              label: 'Secret key header name',
+              formControlName: 'keyHeaderName',
+              formGroup: monitoringEndpointForm,
+            }"
+          />
         </form>
       </div>
       <ng-container footer>
@@ -117,6 +126,7 @@ export class AddMonitoringEndpointDialog {
       name: ['', [Validators.required]],
       url: ['', [Validators.required]],
       key: ['', [Validators.required]],
+      keyHeaderName: ['x-api-monitoring-secret', [Validators.required]],
     });
   }
 
