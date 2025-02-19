@@ -13,7 +13,7 @@ import { DropdownItem } from '../models/dropdown-item.model';
           class="inline-flex w-full cursor-pointer items-center justify-between rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-900 ring-1 shadow-sm ring-gray-300 ring-inset hover:bg-gray-50 dark:bg-gray-600 dark:text-gray-300 hover:dark:bg-gray-500"
           (click)="toggleDropdown()"
         >
-          <span class="mx-auto">{{ selectedItem()?.label }}</span>
+          <span class="mx-auto truncate">{{ selectedItem()?.label }}</span>
           <svg
             class="ml-2 h-5 w-5 text-gray-400"
             viewBox="0 0 20 20"
@@ -42,7 +42,7 @@ import { DropdownItem } from '../models/dropdown-item.model';
             To: "transform opacity-0 scale-95"
         -->
         <div
-          class="absolute z-10 mt-0.5 w-full origin-top-right rounded-md bg-white ring-1 shadow-lg ring-gray-300 ring-inset placeholder:text-gray-400"
+          class="absolute z-10 mt-0.5 min-w-[min(100%,theme(width.64))] origin-top-right rounded-md bg-white ring-1 shadow-lg ring-gray-300 ring-inset placeholder:text-gray-400"
           (mouseleave)="toggleDropdown()"
         >
           <div class="py-1" role="none">
