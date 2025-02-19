@@ -13,6 +13,7 @@ import { DropdownItem } from '../shared/models/dropdown-item.model';
 import { MonitoringEndpoint } from '../shared/models/monitoring-endpoint.model';
 import { MonitoringEndpointService } from '../shared/services/monitoring-endpoint.service';
 import { DropdownComponent } from '../shared/components/dropdown.component';
+import { ApiMonitoringService } from '../shared/services/api-monitoring.service';
 
 @Component({
   selector: 'app-main-toolbar',
@@ -75,6 +76,7 @@ import { DropdownComponent } from '../shared/components/dropdown.component';
   `,
 })
 export class MainToolbarComponent {
+  private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
   private dialogService = inject(DialogService);
   layoutService = inject(LayoutService);
@@ -106,6 +108,8 @@ export class MainToolbarComponent {
     // Set current endpoint when dropdown items is selected.
     effect(() => {
       const endpoint = this.selectedDropdownItemMonitorEndpoint()?.value;
+      if (!endpoint) return;
+      this.apiMonitoringService.setEndpoint(endpoint);
       this.monitoringEndpointService.currentEndpoint.set(endpoint);
     });
   }
