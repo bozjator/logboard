@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   inject,
+  Signal,
   signal,
   WritableSignal,
 } from '@angular/core';
@@ -81,14 +82,15 @@ export class MainToolbarComponent {
   private dialogService = inject(DialogService);
   layoutService = inject(LayoutService);
 
-  dropdownItemsMonitorEndpoints = computed(() =>
-    (this.monitoringEndpointService.monitoringEndpoints() ?? []).map(
-      (endpoint) => ({
-        label: endpoint.name,
-        value: endpoint,
-      }),
-    ),
-  );
+  dropdownItemsMonitorEndpoints: Signal<DropdownItem<MonitoringEndpoint>[]> =
+    computed(() =>
+      (this.monitoringEndpointService.monitoringEndpoints() ?? []).map(
+        (endpoint) => ({
+          label: endpoint.name,
+          value: endpoint,
+        }),
+      ),
+    );
 
   selectedDropdownItemMonitorEndpoint: WritableSignal<
     DropdownItem<MonitoringEndpoint> | undefined
