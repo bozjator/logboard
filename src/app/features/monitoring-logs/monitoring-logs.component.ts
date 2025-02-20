@@ -1,7 +1,14 @@
-import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, map, skip, switchMap } from 'rxjs';
 import { ApiMonitoringService } from '../../shared/services/api-monitoring.service';
 import { SortOrder } from '../../shared/models/sort-order.enum';
 import { LogSortColumn, LogsQuery } from '../../shared/models/logs-query.model';
@@ -10,12 +17,21 @@ import { MonitoringLogList } from '../../shared/models/monitoring-log-list.dto';
 import { MonitoringEndpointService } from '../../shared/services/monitoring-endpoint.service';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 import { PaginationQuery } from '../../shared/models/pagination.model';
+import { LogsFiltersComponent } from './components/logs-filters.component';
 import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
 
 @Component({
   selector: 'app-monitoring-logs',
-  imports: [CommonModule, LogsTableComponent, PaginationComponent],
+  imports: [
+    CommonModule,
+    LogsTableComponent,
+    PaginationComponent,
+    LogsFiltersComponent,
+  ],
   template: `
+    <div class="mt-8">
+      <app-logs-filters [logsQuery$]="logsQuery$" />
+    </div>
     <app-logs-table [logs]="logs()" />
     <div class="mt-3">
       <app-pagination
@@ -28,10 +44,12 @@ import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
     </div>
   `,
 })
-export class MonitoringLogsComponent {
+export class MonitoringLogsComponent implements AfterViewInit {
   private destroyRef = inject(DestroyRef);
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
+
+  private mustResetPagination = false;
 
   private tablePageItemsStorage = {
     set: (pageItems: number) =>
@@ -45,13 +63,15 @@ export class MonitoringLogsComponent {
       ),
   };
 
-  private logsQueryDefault: LogsQuery = {
+  private paginationQueryDefault: PaginationQuery = {
     pageNumber: 1,
     pageItems: this.tablePageItemsStorage.get(),
     sortOrder: SortOrder.asc,
-    sortColumn: LogSortColumn.createdAt,
   };
-  logsQuery$ = new BehaviorSubject<LogsQuery>({ ...this.logsQueryDefault });
+  logsQuery$ = new BehaviorSubject<LogsQuery>({
+    ...this.paginationQueryDefault,
+    sortColumn: LogSortColumn.createdAt,
+  });
 
   logs = signal<MonitoringLogList | undefined>(undefined);
 
@@ -59,17 +79,31 @@ export class MonitoringLogsComponent {
     this.onEndpointChange();
   }
 
+  ngAfterViewInit(): void {
+    this.subscribeToFiltersToGetLogs();
+  }
+
   private onEndpointChange() {
     effect(() => {
       const currentEndpoint = this.monitoringEndpointService.currentEndpoint();
       if (!currentEndpoint) return;
-      this.getLogs();
+      this.mustResetPagination = true;
     });
   }
 
-  private getLogs() {
+  private subscribeToFiltersToGetLogs() {
     this.logsQuery$
       .pipe(
+        map((query): LogsQuery => {
+          if (this.mustResetPagination) {
+            this.mustResetPagination = false;
+            return {
+              ...query,
+              ...this.paginationQueryDefault,
+            };
+          } else return query;
+        }),
+        skip(1),
         switchMap((query) => this.apiMonitoringService.getLogs(query)),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -95,6 +129,7 @@ export class MonitoringLogsComponent {
   onPageItemsChange(pageItems: number): void {
     this.updatePagination({ pageNumber: 1, pageItems });
     this.tablePageItemsStorage.set(pageItems);
+    this.paginationQueryDefault.pageItems = pageItems;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
