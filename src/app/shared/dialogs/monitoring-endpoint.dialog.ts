@@ -3,6 +3,8 @@ import {
   ChangeDetectionStrategy,
   output,
   inject,
+  signal,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -15,6 +17,7 @@ import {
 import { DialogComponent } from './base/dialog.component';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 import { MonitoringEndpointService } from '../services/monitoring-endpoint.service';
+import { DialogDataMonitoringEndpoint } from './models/dialog-data-monitoring-endpoint.model';
 
 interface MonitoringEndpointForm {
   name: FormControl<string | null>;
@@ -24,7 +27,7 @@ interface MonitoringEndpointForm {
 }
 
 @Component({
-  selector: 'app-add-monitoring-endpoint-dialog',
+  selector: 'app-dialog-monitoring-endpoint',
   imports: [CommonModule, ReactiveFormsModule, DialogComponent],
   template: `
     <ng-template
@@ -53,7 +56,7 @@ interface MonitoringEndpointForm {
         </div>
       </div>
     </ng-template>
-    <app-dialog [title]="'Add monitoring endpoint'">
+    <app-dialog [title]="'Monitoring endpoint'">
       <div class="mb-8 dark:text-gray-100">
         <form [formGroup]="monitoringEndpointForm">
           <ng-template
@@ -91,6 +94,9 @@ interface MonitoringEndpointForm {
         </form>
       </div>
       <ng-container footer>
+        @if (errorMessage()) {
+          <div class="flex items-center text-red-700">{{ errorMessage() }}</div>
+        }
         <button
           type="button"
           class="cursor-pointer rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
@@ -101,42 +107,129 @@ interface MonitoringEndpointForm {
         <button
           type="button"
           class="cursor-pointer rounded-md bg-blue-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-          (click)="addMonitoringEndpoint()"
+          (click)="
+            dialogData().isModeEditCurrent
+              ? updateMonitoringEndpoint()
+              : addMonitoringEndpoint()
+          "
         >
-          Add
+          @if (dialogData().isModeEditCurrent) {
+            Update
+          } @else {
+            Add
+          }
         </button>
       </ng-container>
     </app-dialog>
   `,
 })
-export class AddMonitoringEndpointDialog {
+export class MonitoringEndpointDialog implements OnInit {
   private formBuilder = inject(FormBuilder);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
+  dialogData = signal<DialogDataMonitoringEndpoint>({
+    isModeEditCurrent: false,
+  });
   dialogClose = output<void>();
 
   monitoringEndpointForm!: FormGroup<MonitoringEndpointForm>;
+  errorMessage = signal<string | undefined>(undefined);
 
-  constructor() {
+  ngOnInit() {
     this.setupForm();
   }
 
   private setupForm() {
-    this.monitoringEndpointForm = this.formBuilder.group({
+    const formGroup = {
       name: ['', [Validators.required]],
       url: ['', [Validators.required]],
       key: ['', [Validators.required]],
       keyHeaderName: ['x-api-monitoring-secret', [Validators.required]],
-    });
+    };
+
+    const endpoint = this.monitoringEndpointService.currentEndpoint();
+    if (this.dialogData().isModeEditCurrent && endpoint) {
+      formGroup.name[0] = endpoint.name;
+      formGroup.url[0] = endpoint.url;
+      formGroup.key[0] = endpoint.key;
+      formGroup.keyHeaderName[0] = endpoint.keyHeaderName;
+    }
+
+    this.monitoringEndpointForm = this.formBuilder.group(formGroup);
+  }
+
+  private doesEndpointExists(
+    existingEndpoints: MonitoringEndpoint[],
+    newEndpoint: MonitoringEndpoint,
+  ): boolean {
+    const existingEndpoint = existingEndpoints.find(
+      (endpoint) =>
+        endpoint.name === newEndpoint.name || endpoint.url === newEndpoint.url,
+    );
+    return !!existingEndpoint;
   }
 
   addMonitoringEndpoint() {
+    this.errorMessage.set(undefined);
     if (!this.monitoringEndpointForm.valid) return;
+
     const newEndpoint = this.monitoringEndpointForm.value as MonitoringEndpoint;
     const existingEndpoints =
       this.monitoringEndpointService.monitoringEndpoints() ?? [];
+
+    // Check if endpoint, with same data, already exists.
+    const endpointExists = this.doesEndpointExists(
+      existingEndpoints,
+      newEndpoint,
+    );
+    if (endpointExists) {
+      this.errorMessage.set('Endpoint with given Name or URL already exists.');
+      return;
+    }
+
+    // Add new endpoint.
     const endpoints = [...existingEndpoints, newEndpoint];
     this.monitoringEndpointService.monitoringEndpoints.set(endpoints);
+
+    this.dialogClose.emit();
+  }
+
+  updateMonitoringEndpoint() {
+    this.errorMessage.set(undefined);
+    if (!this.monitoringEndpointForm.valid) return;
+
+    const updatedEndpoint = this.monitoringEndpointForm
+      .value as MonitoringEndpoint;
+    const currentEndpoint = this.monitoringEndpointService.currentEndpoint();
+    const existingEndpoints =
+      this.monitoringEndpointService.monitoringEndpoints() ?? [];
+
+    if (!currentEndpoint) return;
+
+    // Check if endpoint, with same data, already exists.
+    const endpointExists = this.doesEndpointExists(
+      existingEndpoints,
+      updatedEndpoint,
+    );
+    if (endpointExists) {
+      this.errorMessage.set('Endpoint with given Name or URL already exists.');
+      return;
+    }
+
+    // Update endpoint.
+    const endpointInUpdateIndex = existingEndpoints.findIndex(
+      (endpoint) =>
+        endpoint.name === currentEndpoint.name ||
+        endpoint.url === currentEndpoint.url,
+    );
+    if (endpointInUpdateIndex === -1) {
+      this.errorMessage.set('Did not found endpoint to update.');
+      return;
+    }
+    const endpoints = [...existingEndpoints];
+    endpoints.splice(endpointInUpdateIndex, 1, updatedEndpoint);
+    this.monitoringEndpointService.monitoringEndpoints.set(endpoints);
+
     this.dialogClose.emit();
   }
 }
