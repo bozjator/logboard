@@ -218,8 +218,11 @@ export class MonitoringEndpointDialog implements OnInit {
     if (!currentEndpoint) return;
 
     // Check if endpoint, with same data, already exists.
+    const existingEndpointsWithoutCurrent = existingEndpoints.filter(
+      (endpoint) => endpoint.name !== currentEndpoint.name,
+    );
     const endpointExists = this.doesEndpointExists(
-      existingEndpoints,
+      existingEndpointsWithoutCurrent,
       updatedEndpoint,
     );
     if (endpointExists) {
@@ -229,9 +232,7 @@ export class MonitoringEndpointDialog implements OnInit {
 
     // Update endpoint.
     const endpointInUpdateIndex = existingEndpoints.findIndex(
-      (endpoint) =>
-        endpoint.name === currentEndpoint.name ||
-        endpoint.url === currentEndpoint.url,
+      (endpoint) => endpoint.name === currentEndpoint.name,
     );
     if (endpointInUpdateIndex === -1) {
       this.errorMessage.set('Did not found endpoint to update.');
