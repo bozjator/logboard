@@ -1,11 +1,11 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dialog',
   imports: [CommonModule],
   template: `
-    <div class="fixed inset-0 z-40 bg-black/40">
+    <div class="fixed inset-0 z-40 bg-black/50">
       <div class="absolute inset-0"></div>
 
       <div

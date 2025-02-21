@@ -6,7 +6,7 @@ import {
   EnvironmentInjector,
   inject,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -24,9 +24,9 @@ export class DialogService {
     }
   }
 
-  open<T>(component: any, data?: T) {
+  open<T, R = void>(component: any, data?: T): Observable<R | undefined> {
     this.ensureContainer();
-    if (!this.containerElement) return;
+    if (!this.containerElement) return new Observable();
 
     // Dynamically create the dialog component.
     const componentRef = createComponent(component, {
@@ -42,13 +42,20 @@ export class DialogService {
         console.error('Failed to set dialog data: ', error);
       }
 
+    // Create a Subject to return the result
+    const closeSubject = new Subject<R | undefined>();
+
     // Close dialog signal listener.
     let subscriptionDialogClose: Subscription | null = null;
     if (dialogInstance.dialogClose)
-      subscriptionDialogClose = dialogInstance.dialogClose.subscribe(() => {
-        this.close(componentRef);
-        subscriptionDialogClose?.unsubscribe();
-      });
+      subscriptionDialogClose = dialogInstance.dialogClose.subscribe(
+        (result: R | undefined) => {
+          closeSubject.next(result);
+          closeSubject.complete();
+          this.close(componentRef);
+          subscriptionDialogClose?.unsubscribe();
+        },
+      );
 
     // Attach the component to the application view.
     this.appRef.attachView(componentRef.hostView);
@@ -57,7 +64,7 @@ export class DialogService {
     const dialogElement = componentRef.location.nativeElement;
     this.containerElement.appendChild(dialogElement);
 
-    return componentRef;
+    return closeSubject.asObservable();
   }
 
   private close(componentRef: ComponentRef<any>) {
