@@ -6,6 +6,7 @@ import {
   EnvironmentInjector,
   inject,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -42,8 +43,12 @@ export class DialogService {
       }
 
     // Close dialog signal listener.
+    let subscriptionDialogClose: Subscription | null = null;
     if (dialogInstance.dialogClose)
-      dialogInstance.dialogClose.subscribe(() => this.close(componentRef));
+      subscriptionDialogClose = dialogInstance.dialogClose.subscribe(() => {
+        this.close(componentRef);
+        subscriptionDialogClose?.unsubscribe();
+      });
 
     // Attach the component to the application view.
     this.appRef.attachView(componentRef.hostView);
