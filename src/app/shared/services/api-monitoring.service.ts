@@ -6,6 +6,7 @@ import { LogsQuery } from '../models/logs-query.model';
 import { Utils } from './utils.service';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 import { MonitoringLogListFilters } from '../models/monitoring-log-list-filters.dto';
+import { MonitoringGeneral } from '../models/monitoring-general.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,13 @@ export class ApiMonitoringService {
   public getLogsFilters(): Observable<MonitoringLogListFilters> {
     return this.http.get<MonitoringLogListFilters>(
       this.apiUrl + '/logs-filters',
+      this.httpOptions,
+    );
+  }
+
+  public getGeneral(): Observable<MonitoringGeneral> {
+    return this.http.get<MonitoringGeneral>(
+      this.apiUrl + '/general',
       this.httpOptions,
     );
   }
