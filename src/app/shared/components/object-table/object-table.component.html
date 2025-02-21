@@ -4,7 +4,7 @@
       <table class="w-full divide-y divide-gray-300 dark:divide-neutral-700">
         <thead>
           <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
-            @for (entry of logsItems()?.[0] ?? []; track $index) {
+            @for (entry of objectsItems()[0]; track $index) {
               <th
                 scope="col"
                 class="max-w-20 py-3.5 pr-4 pl-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-400"
@@ -17,28 +17,14 @@
         <tbody
           class="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-zinc-700"
         >
-          @for (logItem of logsItems(); track $index) {
+          @for (item of objectsItems(); track $index) {
             <tr class="divide-x divide-gray-200 dark:divide-gray-600">
-              @for (entry of logItem; track $index) {
+              @for (entry of item; track $index) {
                 <td
                   [title]="entry[1]"
-                  class="max-w-20 p-4 text-xs break-words text-gray-600 dark:text-gray-400"
-                  [ngClass]="{
-                    truncate: [
-                      'errorStack',
-                      'queueJobData',
-                      'request',
-                    ].includes(entry[0]),
-                    'max-w-50': ['info', 'response', 'request'].includes(
-                      entry[0]
-                    ),
-                  }"
+                  class="max-w-20 truncate p-4 text-xs break-words text-gray-600 dark:text-gray-400"
                 >
-                  @if (entry[0] === 'timestamp') {
-                    {{ entry[1] | date: 'medium' }}
-                  } @else {
-                    {{ entry[1] }}
-                  }
+                  {{ entry[1] }}
                 </td>
               }
             </tr>
