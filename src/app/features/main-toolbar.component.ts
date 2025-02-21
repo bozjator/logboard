@@ -23,26 +23,28 @@ import { DialogDataMonitoringEndpoint } from '../shared/dialogs/models/dialog-da
   template: `
     <div class="absolute top-4 right-4">
       <div class="flex space-x-2">
-        <app-dropdown
-          [items]="dropdownItemsMonitorEndpoints()"
-          [(selectedItem)]="selectedDropdownItemMonitorEndpoint"
-        />
+        @if (dropdownItemsMonitorEndpoints().length > 0) {
+          <app-dropdown
+            [items]="dropdownItemsMonitorEndpoints()"
+            [(selectedItem)]="selectedDropdownItemMonitorEndpoint"
+          />
 
-        <button
-          (click)="openDialogEditMonitoringEndpoint()"
-          class="cursor-pointer rounded-md bg-blue-600/80 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500"
-        >
-          <svg
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            fill="#e8eaed"
+          <button
+            (click)="openDialogEditMonitoringEndpoint()"
+            class="cursor-pointer rounded-md bg-blue-600/80 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500"
           >
-            <path
-              d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"
-            />
-          </svg>
-        </button>
+            <svg
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill="#e8eaed"
+            >
+              <path
+                d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"
+              />
+            </svg>
+          </button>
+        }
 
         <button
           (click)="openDialogAddMonitoringEndpoint()"
