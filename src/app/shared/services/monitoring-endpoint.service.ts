@@ -55,4 +55,23 @@ export class MonitoringEndpointService {
       // TODO handle decryption failure - ask again for password or offer to clear data.
     }
   }
+
+  removeCurrentEndpoint(): boolean {
+    const currentEndpoint = this.currentEndpoint();
+    if (!currentEndpoint) return false;
+
+    const endpointsCount = (this.monitoringEndpoints() ?? []).length;
+    const filteredEndpoints = (this.monitoringEndpoints() ?? []).filter(
+      (endpoint) =>
+        !(
+          endpoint.name === currentEndpoint.name &&
+          endpoint.url === currentEndpoint.url
+        ),
+    );
+
+    this.monitoringEndpoints.set(filteredEndpoints);
+    this.currentEndpoint.set(filteredEndpoints[0]);
+
+    return endpointsCount != this.monitoringEndpoints()?.length;
+  }
 }

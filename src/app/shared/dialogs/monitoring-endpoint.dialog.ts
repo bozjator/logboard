@@ -1,11 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  output,
-  inject,
-  signal,
-  OnInit,
-} from '@angular/core';
+import { Component, output, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -18,6 +11,9 @@ import { DialogComponent } from './base/dialog.component';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 import { MonitoringEndpointService } from '../services/monitoring-endpoint.service';
 import { DialogDataMonitoringEndpoint } from './models/dialog-data-monitoring-endpoint.model';
+import { DialogService } from './base/dialog.service';
+import { DialogDataConfirmation } from './models/dialog-data-confirmation.model';
+import { ConfirmationDialogComponent } from './confirmation.dialog';
 
 interface MonitoringEndpointForm {
   name: FormControl<string | null>;
@@ -93,20 +89,34 @@ interface MonitoringEndpointForm {
           />
         </form>
       </div>
+      <ng-container footer-start>
+        <button
+          (click)="openDialogDeleteEndpoint()"
+          class="cursor-pointer rounded-md bg-red-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500"
+        >
+          <svg
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            fill="#e8eaed"
+          >
+            <path
+              d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"
+            />
+          </svg>
+        </button>
+      </ng-container>
       <ng-container footer>
         @if (errorMessage()) {
           <div class="flex items-center text-red-700">{{ errorMessage() }}</div>
         }
-        <button
-          type="button"
-          class="cursor-pointer rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-          (click)="dialogClose.emit()"
-        >
+
+        <button type="button" class="app-btn-sec" (click)="dialogClose.emit()">
           Cancel
         </button>
         <button
           type="button"
-          class="cursor-pointer rounded-md bg-blue-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          class="app-btn"
           (click)="
             dialogData().isModeEditCurrent
               ? updateMonitoringEndpoint()
@@ -125,6 +135,7 @@ interface MonitoringEndpointForm {
 })
 export class MonitoringEndpointDialog implements OnInit {
   private formBuilder = inject(FormBuilder);
+  private dialogService = inject(DialogService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
   dialogData = signal<DialogDataMonitoringEndpoint>({
@@ -231,5 +242,19 @@ export class MonitoringEndpointDialog implements OnInit {
     this.monitoringEndpointService.monitoringEndpoints.set(endpoints);
 
     this.dialogClose.emit();
+  }
+
+  openDialogDeleteEndpoint() {
+    this.dialogClose.emit();
+    const currentEndpoint = this.monitoringEndpointService.currentEndpoint();
+    this.dialogService
+      .open<DialogDataConfirmation, boolean>(ConfirmationDialogComponent, {
+        title: 'Delete endpoint',
+        content: `Are you sure you want to delete ${currentEndpoint?.name} endpoint?`,
+      })
+      .subscribe((isOkToDelete) => {
+        if (isOkToDelete)
+          this.monitoringEndpointService.removeCurrentEndpoint();
+      });
   }
 }
