@@ -1,50 +1,54 @@
 <div class="m-2 flow-root bg-white p-2 dark:bg-neutral-800">
   <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-      <table class="w-full divide-y divide-gray-300 dark:divide-neutral-700">
-        <thead>
-          <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
-            @for (entry of logsItems()?.[0] ?? []; track $index) {
-              <th
-                scope="col"
-                class="max-w-20 py-3.5 pr-4 pl-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-400"
-              >
-                {{ entry[0] | camelCaseToTitle }}
-              </th>
-            }
-          </tr>
-        </thead>
-        <tbody
-          class="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-zinc-700"
-        >
-          @for (logItem of logsItems(); track $index) {
-            <tr class="divide-x divide-gray-200 dark:divide-gray-600">
-              @for (entry of logItem; track $index) {
-                <td
-                  [title]="entry[1]"
-                  class="max-w-20 p-4 text-xs break-words text-gray-600 dark:text-gray-400"
-                  [ngClass]="{
-                    truncate: [
-                      'errorStack',
-                      'queueJobData',
-                      'request',
-                    ].includes(entry[0]),
-                    'max-w-50': ['info', 'response', 'request'].includes(
-                      entry[0]
-                    ),
-                  }"
+      @if (logsItems()?.length === 0) {
+        <div class="m-4 ml-8 text-gray-500">-- no data --</div>
+      } @else {
+        <table class="w-full divide-y divide-gray-300 dark:divide-neutral-700">
+          <thead>
+            <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
+              @for (entry of logsItems()?.[0] ?? []; track $index) {
+                <th
+                  scope="col"
+                  class="max-w-20 py-3.5 pr-4 pl-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-400"
                 >
-                  @if (entry[0] === 'timestamp') {
-                    {{ entry[1] | date: 'medium' }}
-                  } @else {
-                    {{ entry[1] }}
-                  }
-                </td>
+                  {{ entry[0] | camelCaseToTitle }}
+                </th>
               }
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-zinc-700"
+          >
+            @for (logItem of logsItems(); track $index) {
+              <tr class="divide-x divide-gray-200 dark:divide-gray-600">
+                @for (entry of logItem; track $index) {
+                  <td
+                    [title]="entry[1]"
+                    class="max-w-20 p-4 text-xs break-words text-gray-600 dark:text-gray-400"
+                    [ngClass]="{
+                      truncate: [
+                        'errorStack',
+                        'queueJobData',
+                        'request',
+                      ].includes(entry[0]),
+                      'max-w-50': ['info', 'response', 'request'].includes(
+                        entry[0]
+                      ),
+                    }"
+                  >
+                    @if (entry[0] === 'timestamp') {
+                      {{ entry[1] | date: 'medium' }}
+                    } @else {
+                      {{ entry[1] }}
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </div>
   </div>
 </div>

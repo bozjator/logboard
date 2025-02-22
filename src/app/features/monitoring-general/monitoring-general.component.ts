@@ -48,6 +48,9 @@ import { LoadingIndicatorComponent } from '../../shared/components/loading-indic
           <div class="mx-2 my-6 border-t border-gray-400"></div>
         </div>
       }
+      @if (loggerDBTransportErrorLogs().length === 0) {
+        <div class="m-4 ml-8">-- no data --</div>
+      }
 
       @for (item of otherData(); track $index) {
         <app-title-right-line
