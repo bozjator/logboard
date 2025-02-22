@@ -29,7 +29,7 @@ import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
     LogsFiltersComponent,
   ],
   template: `
-    <div class="mt-8">
+    <div class="m-4">
       <app-logs-filters [logsQuery$]="logsQuery$" />
     </div>
     <app-logs-table [logs]="logs()" />

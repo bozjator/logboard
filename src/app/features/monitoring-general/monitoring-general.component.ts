@@ -22,20 +22,23 @@ import { CamelCaseToTitlePipe } from '../../shared/pipes/camel-case-to-title.pip
         [textColor]="'text-gray-700 dark:text-gray-300'"
         [borderColor]="'border-gray-400'"
         [bgColor]="'bg-neutral-100 dark:bg-zinc-800'"
+        [class]="'mt-4'"
       />
       @for (log of loggerDBTransportErrorLogs(); track $index) {
-        <app-title-right-line
-          [class]="'text-xs'"
-          [title]="'Error and logger log'"
-          [textColor]="'text-gray-700 dark:text-gray-300'"
-          [borderColor]="'border-gray-400'"
-          [bgColor]="'bg-neutral-100 dark:bg-zinc-800'"
-        />
-        <app-object-table [objects]="[log.error]" />
-        <app-logs-table
-          [logs]="{ totalCount: 1, result: [log.loggerRecord] }"
-        />
-        <div class="mx-2 my-6 border-t border-gray-400"></div>
+        <div class="m-2">
+          <app-title-right-line
+            [class]="'text-xs'"
+            [title]="'Error and logger log'"
+            [textColor]="'text-gray-700 dark:text-gray-300'"
+            [borderColor]="'border-gray-400'"
+            [bgColor]="'bg-neutral-100 dark:bg-zinc-800'"
+          />
+          <app-object-table [objects]="[log.error]" />
+          <app-logs-table
+            [logs]="{ totalCount: 1, result: [log.loggerRecord] }"
+          />
+          <div class="mx-2 my-6 border-t border-gray-400"></div>
+        </div>
       }
 
       @for (item of otherData(); track $index) {
