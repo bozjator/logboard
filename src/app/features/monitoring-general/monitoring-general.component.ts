@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs';
 import { ApiMonitoringService } from '../../shared/services/api-monitoring.service';
 import { MonitoringEndpointService } from '../../shared/services/monitoring-endpoint.service';
 import { LogsTableComponent } from '../monitoring-logs/components/logs-table/logs-table.component';
@@ -8,6 +9,7 @@ import { MonitoringLoggerDBTransportError } from '../../shared/models/monitoring
 import { CamelCaseToTitlePipe } from '../../shared/pipes/camel-case-to-title.pipe';
 import { NotificationService } from '../../shared/components/notification/notification.service';
 import { AlertType } from '../../shared/components/alert.component';
+import { LoadingIndicatorComponent } from '../../shared/components/loading-indicator.component';
 
 @Component({
   selector: 'app-monitoring-general',
@@ -16,8 +18,12 @@ import { AlertType } from '../../shared/components/alert.component';
     TitleRightLineComponent,
     ObjectLogsTableComponent,
     CamelCaseToTitlePipe,
+    LoadingIndicatorComponent,
   ],
   template: `
+    @if (loadingData()) {
+      <app-loading-indicator />
+    }
     <div class="text-black dark:text-white">
       <app-title-right-line
         [title]="'Logger database transport error logs'"
@@ -70,6 +76,7 @@ export class MonitoringGeneralComponent {
   JSON = JSON;
   loggerDBTransportErrorLogs = signal<MonitoringLoggerDBTransportError[]>([]);
   otherData = signal<(string[] | [string, any])[]>([]);
+  loadingData = signal(false);
 
   constructor() {
     this.onEndpointChange();
@@ -84,22 +91,25 @@ export class MonitoringGeneralComponent {
   }
 
   private getGeneralData() {
-    // TODO show loading indicator.
-    this.apiMonitoringService.getGeneral().subscribe({
-      next: (infoData) => {
-        this.loggerDBTransportErrorLogs.set(
-          infoData.loggerDBTransportErrorLogs,
-        );
-        const { loggerDBTransportErrorLogs, ...otherData } = infoData;
-        this.otherData.set(Object.entries(otherData));
-      },
-      error: (error) => {
-        console.error(error);
-        this.notificationService.show('Error getting general logs.', {
-          type: AlertType.red,
-          title: 'Error',
-        });
-      },
-    });
+    this.loadingData.set(true);
+    this.apiMonitoringService
+      .getGeneral()
+      .pipe(finalize(() => this.loadingData.set(false)))
+      .subscribe({
+        next: (infoData) => {
+          this.loggerDBTransportErrorLogs.set(
+            infoData.loggerDBTransportErrorLogs,
+          );
+          const { loggerDBTransportErrorLogs, ...otherData } = infoData;
+          this.otherData.set(Object.entries(otherData));
+        },
+        error: (error) => {
+          console.error(error);
+          this.notificationService.show('Error getting general logs.', {
+            type: AlertType.red,
+            title: 'Error',
+          });
+        },
+      });
   }
 }

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, map, skip, switchMap } from 'rxjs';
+import { BehaviorSubject, finalize, map, skip, switchMap, tap } from 'rxjs';
 import { ApiMonitoringService } from '../../shared/services/api-monitoring.service';
 import { SortOrder } from '../../shared/models/sort-order.enum';
 import { LogSortColumn, LogsQuery } from '../../shared/models/logs-query.model';
@@ -21,6 +21,7 @@ import { LogsFiltersComponent } from './components/logs-filters.component';
 import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
 import { NotificationService } from '../../shared/components/notification/notification.service';
 import { AlertType } from '../../shared/components/alert.component';
+import { LoadingIndicatorComponent } from '../../shared/components/loading-indicator.component';
 
 @Component({
   selector: 'app-monitoring-logs',
@@ -29,11 +30,16 @@ import { AlertType } from '../../shared/components/alert.component';
     LogsTableComponent,
     PaginationComponent,
     LogsFiltersComponent,
+    LoadingIndicatorComponent,
   ],
   template: `
     <div class="m-4">
       <app-logs-filters [logsQuery$]="logsQuery$" />
     </div>
+
+    @if (loadingData()) {
+      <app-loading-indicator />
+    }
     <app-logs-table [logs]="logs()" />
     <div class="mt-3">
       <app-pagination
@@ -52,6 +58,7 @@ export class MonitoringLogsComponent implements AfterViewInit {
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
+  loadingData = signal(false);
   private mustResetPagination = false;
 
   private tablePageItemsStorage = {
@@ -95,7 +102,6 @@ export class MonitoringLogsComponent implements AfterViewInit {
   }
 
   private subscribeToFiltersToGetLogs() {
-    // TODO show loading indicator.
     this.logsQuery$
       .pipe(
         map((query): LogsQuery => {
@@ -108,7 +114,12 @@ export class MonitoringLogsComponent implements AfterViewInit {
           } else return query;
         }),
         skip(1),
-        switchMap((query) => this.apiMonitoringService.getLogs(query)),
+        tap(() => this.loadingData.set(true)),
+        switchMap((query) =>
+          this.apiMonitoringService
+            .getLogs(query)
+            .pipe(finalize(() => this.loadingData.set(false))),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({

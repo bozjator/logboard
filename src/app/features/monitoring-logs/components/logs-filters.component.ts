@@ -7,7 +7,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, finalize } from 'rxjs';
 import { CamelCaseToTitlePipe } from '../../../shared/pipes/camel-case-to-title.pipe';
 import { LogsQuery } from '../../../shared/models/logs-query.model';
 import { ApiMonitoringService } from '../../../shared/services/api-monitoring.service';
@@ -17,6 +17,7 @@ import { DropdownItem } from '../../../shared/models/dropdown-item.model';
 import { DropdownComponent } from '../../../shared/components/dropdown.component';
 import { NotificationService } from '../../../shared/components/notification/notification.service';
 import { AlertType } from '../../../shared/components/alert.component';
+import { LoadingIndicatorComponent } from '../../../shared/components/loading-indicator.component';
 
 interface FilterDropdown {
   label: string;
@@ -26,8 +27,16 @@ interface FilterDropdown {
 
 @Component({
   selector: 'app-logs-filters',
-  imports: [CommonModule, CamelCaseToTitlePipe, DropdownComponent],
+  imports: [
+    CommonModule,
+    CamelCaseToTitlePipe,
+    DropdownComponent,
+    LoadingIndicatorComponent,
+  ],
   template: `
+    @if (loadingData()) {
+      <app-loading-indicator />
+    }
     <div class="flex flex-wrap gap-4 text-gray-800 dark:text-gray-50">
       @for (filter of filtersDropdowns(); track $index) {
         <div class="flex min-w-sm flex-col md:min-w-lg">
@@ -68,6 +77,7 @@ export class LogsFiltersComponent {
   logsQuery$ = input.required<BehaviorSubject<LogsQuery>>();
 
   filtersDropdowns = signal<FilterDropdown[]>([]);
+  loadingData = signal(false);
 
   constructor() {
     this.getFiltersOnEndpointChange();
@@ -93,17 +103,20 @@ export class LogsFiltersComponent {
   }
 
   private getLogFiltersValues() {
-    // TODO show loading indicator.
-    this.apiMonitoringService.getLogsFilters().subscribe({
-      next: (filters) => this.prepareFilters(filters),
-      error: (error) => {
-        console.error(error);
-        this.notificationService.show('Error getting logs filters.', {
-          type: AlertType.red,
-          title: 'Error',
-        });
-      },
-    });
+    this.loadingData.set(true);
+    this.apiMonitoringService
+      .getLogsFilters()
+      .pipe(finalize(() => this.loadingData.set(false)))
+      .subscribe({
+        next: (filters) => this.prepareFilters(filters),
+        error: (error) => {
+          console.error(error);
+          this.notificationService.show('Error getting logs filters.', {
+            type: AlertType.red,
+            title: 'Error',
+          });
+        },
+      });
   }
 
   private prepareFilters(filters: MonitoringLogListFilters) {
