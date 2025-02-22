@@ -2,12 +2,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@layer utilities {
-  .app-btn {
-    @apply inline-flex h-9 w-auto cursor-pointer flex-row items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors duration-300 hover:bg-blue-600 hover:shadow disabled:cursor-default disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:hover:bg-gray-200 dark:disabled:bg-gray-700;
-  }
+/* --- Buttons ------------------------------------------------------------- */
+.app-btn {
+  @apply inline-flex h-9 w-auto cursor-pointer flex-row items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors duration-300 hover:bg-blue-600 hover:shadow disabled:cursor-default disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:hover:bg-gray-200 dark:disabled:bg-gray-700;
+}
+.app-btn-sec {
+  @apply inline-flex h-9 w-auto cursor-pointer flex-row items-center justify-center rounded-md bg-slate-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors duration-300 hover:bg-slate-600 hover:shadow disabled:cursor-default disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:hover:bg-gray-200 dark:disabled:bg-gray-700;
+}
+/* ------------------------------------------------------------------------- */
 
-  .app-btn-sec {
-    @apply inline-flex h-9 w-auto cursor-pointer flex-row items-center justify-center rounded-md bg-slate-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-colors duration-300 hover:bg-slate-600 hover:shadow disabled:cursor-default disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:hover:bg-gray-200 dark:disabled:bg-gray-700;
+/* --- Global notification popup styling ----------------------------------- */
+.notification {
+  @apply mb-4 max-w-96 rounded bg-gray-600 p-2 pt-0.5 text-white shadow-lg;
+}
+.notification-container {
+  @apply fixed top-6 right-6 z-50 flex flex-col -space-y-2;
+}
+@media (max-width: 1024px) {
+  /* Centered on mobile */
+  .notification-container {
+    @apply top-4 left-1/2 w-80 -translate-x-1/2 transform;
   }
 }
+/* ------------------------------------------------------------------------- */
