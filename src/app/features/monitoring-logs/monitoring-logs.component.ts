@@ -141,13 +141,11 @@ export class MonitoringLogsComponent implements AfterViewInit {
 
   onPageNumberChange(pageNumber: number): void {
     this.updatePagination({ pageNumber });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   onPageItemsChange(pageItems: number): void {
     this.updatePagination({ pageNumber: 1, pageItems });
     this.tablePageItemsStorage.set(pageItems);
     this.paginationQueryDefault.pageItems = pageItems;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
