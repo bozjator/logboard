@@ -76,7 +76,7 @@ export class MonitoringLogsComponent implements AfterViewInit {
   private paginationQueryDefault: PaginationQuery = {
     pageNumber: 1,
     pageItems: this.tablePageItemsStorage.get(),
-    sortOrder: SortOrder.asc,
+    sortOrder: SortOrder.desc,
   };
   logsQuery$ = new BehaviorSubject<LogsQuery>({
     ...this.paginationQueryDefault,
