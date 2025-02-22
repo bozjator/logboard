@@ -4,6 +4,9 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from './auth.service';
 import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
 import { AlertComponent } from '../../shared/components/alert.component';
+import { DialogService } from '../../shared/dialogs/base/dialog.service';
+import { DialogDataConfirmation } from '../../shared/dialogs/models/dialog-data-confirmation.model';
+import { ConfirmationDialogComponent } from '../../shared/dialogs/confirmation.dialog';
 
 @Component({
   selector: 'app-auth',
@@ -69,6 +72,7 @@ import { AlertComponent } from '../../shared/components/alert.component';
 export class AuthComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private dialogService = inject(DialogService);
 
   hasExistingEncryptedData = signal(false);
   errorMessage = signal<string | undefined>(undefined);
@@ -108,7 +112,18 @@ export class AuthComponent {
   }
 
   clearExistingData() {
-    // TODO ask for confirmation then delete existing endpoints.
-    console.log('🚀 ~ AuthComponent ~ clearExistingData: TODO');
+    this.dialogService
+      .open<DialogDataConfirmation, boolean>(ConfirmationDialogComponent, {
+        title: 'Delete existing data',
+        content: `Are you sure you want to delete existing data?`,
+      })
+      .subscribe((isOkToDelete) => {
+        if (isOkToDelete) {
+          window.localStorage.clear();
+          this.errorMessage.set(undefined);
+          this.formControl.password.setValue('');
+          this.hasExistingEncryptedData.set(false);
+        }
+      });
   }
 }
