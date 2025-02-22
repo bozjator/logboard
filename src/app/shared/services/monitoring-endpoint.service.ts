@@ -2,17 +2,17 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import { APP_STORAGE_NAMES } from '../models/app-storage-name.enum';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 import { EncryptionService } from './encryption.service';
+import { AuthService } from '../../features/auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class MonitoringEndpointService {
+  private authService = inject(AuthService);
   private encryptionService = inject(EncryptionService);
 
   readonly monitoringEndpoints = signal<MonitoringEndpoint[] | undefined>(
     undefined,
   );
   readonly currentEndpoint = signal<MonitoringEndpoint | undefined>(undefined);
-
-  private password = 'string1234'; // TODO get it from user.
 
   constructor() {
     this.readEndpointsFromStorage();
@@ -26,7 +26,7 @@ export class MonitoringEndpointService {
       const endpointsAsString = JSON.stringify(endpoints);
       const encryptedData = await this.encryptionService.encryptData(
         endpointsAsString,
-        this.password,
+        this.authService.password,
       );
       window.localStorage.setItem(
         APP_STORAGE_NAMES.monitoringEndpoints,
@@ -46,13 +46,13 @@ export class MonitoringEndpointService {
     try {
       const decryptedData: string = await this.encryptionService.decryptData(
         encryptedData,
-        this.password,
+        this.authService.password,
       );
       const endpoints: MonitoringEndpoint[] = JSON.parse(decryptedData ?? '[]');
       this.monitoringEndpoints.set(endpoints);
     } catch (error) {
       console.error(error);
-      // TODO handle decryption failure - ask again for password or offer to clear data.
+      // TODO show error notification.
     }
   }
 
