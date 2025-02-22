@@ -3,11 +3,14 @@ import { APP_STORAGE_NAMES } from '../models/app-storage-name.enum';
 import { MonitoringEndpoint } from '../models/monitoring-endpoint.model';
 import { EncryptionService } from './encryption.service';
 import { AuthService } from '../../features/auth/auth.service';
+import { NotificationService } from '../components/notification/notification.service';
+import { AlertType } from '../components/alert.component';
 
 @Injectable({ providedIn: 'root' })
 export class MonitoringEndpointService {
   private authService = inject(AuthService);
   private encryptionService = inject(EncryptionService);
+  private notificationService = inject(NotificationService);
 
   readonly monitoringEndpoints = signal<MonitoringEndpoint[] | undefined>(
     undefined,
@@ -52,7 +55,10 @@ export class MonitoringEndpointService {
       this.monitoringEndpoints.set(endpoints);
     } catch (error) {
       console.error(error);
-      // TODO show error notification.
+      this.notificationService.show('Failed to decrypt endpoints.', {
+        type: AlertType.red,
+        title: 'Error',
+      });
     }
   }
 
