@@ -93,6 +93,7 @@ export class LogsFiltersComponent {
   }
 
   private getLogFiltersValues() {
+    // TODO show loading indicator.
     this.apiMonitoringService.getLogsFilters().subscribe({
       next: (filters) => this.prepareFilters(filters),
       error: (error) => {

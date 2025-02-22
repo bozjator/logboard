@@ -84,6 +84,7 @@ export class MonitoringGeneralComponent {
   }
 
   private getGeneralData() {
+    // TODO show loading indicator.
     this.apiMonitoringService.getGeneral().subscribe({
       next: (infoData) => {
         this.loggerDBTransportErrorLogs.set(

@@ -95,6 +95,7 @@ export class MonitoringLogsComponent implements AfterViewInit {
   }
 
   private subscribeToFiltersToGetLogs() {
+    // TODO show loading indicator.
     this.logsQuery$
       .pipe(
         map((query): LogsQuery => {
