@@ -15,6 +15,8 @@ import { MonitoringLogListFilters } from '../../../shared/models/monitoring-log-
 import { MonitoringEndpointService } from '../../../shared/services/monitoring-endpoint.service';
 import { DropdownItem } from '../../../shared/models/dropdown-item.model';
 import { DropdownComponent } from '../../../shared/components/dropdown.component';
+import { NotificationService } from '../../../shared/components/notification/notification.service';
+import { AlertType } from '../../../shared/components/alert.component';
 
 interface FilterDropdown {
   label: string;
@@ -59,6 +61,7 @@ interface FilterDropdown {
   `,
 })
 export class LogsFiltersComponent {
+  private notificationService = inject(NotificationService);
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
@@ -94,7 +97,10 @@ export class LogsFiltersComponent {
       next: (filters) => this.prepareFilters(filters),
       error: (error) => {
         console.error(error);
-        // TODO handle error.
+        this.notificationService.show('Error getting logs filters.', {
+          type: AlertType.red,
+          title: 'Error',
+        });
       },
     });
   }

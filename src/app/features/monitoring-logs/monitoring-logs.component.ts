@@ -19,6 +19,8 @@ import { PaginationComponent } from '../../shared/components/pagination/paginati
 import { PaginationQuery } from '../../shared/models/pagination.model';
 import { LogsFiltersComponent } from './components/logs-filters.component';
 import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
+import { NotificationService } from '../../shared/components/notification/notification.service';
+import { AlertType } from '../../shared/components/alert.component';
 
 @Component({
   selector: 'app-monitoring-logs',
@@ -46,6 +48,7 @@ import { APP_STORAGE_NAMES } from '../../shared/models/app-storage-name.enum';
 })
 export class MonitoringLogsComponent implements AfterViewInit {
   private destroyRef = inject(DestroyRef);
+  private notificationService = inject(NotificationService);
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
@@ -111,7 +114,10 @@ export class MonitoringLogsComponent implements AfterViewInit {
         next: (logs) => this.logs.set(logs),
         error: (error) => {
           console.error(error);
-          // TODO: Handle error.
+          this.notificationService.show('Error getting logs.', {
+            type: AlertType.red,
+            title: 'Error',
+          });
         },
       });
   }

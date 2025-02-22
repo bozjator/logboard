@@ -6,6 +6,8 @@ import { TitleRightLineComponent } from '../../shared/components/title-right-lin
 import { ObjectLogsTableComponent } from '../../shared/components/object-table/object-table.component';
 import { MonitoringLoggerDBTransportError } from '../../shared/models/monitoring-logger-db-transport-error.dto';
 import { CamelCaseToTitlePipe } from '../../shared/pipes/camel-case-to-title.pipe';
+import { NotificationService } from '../../shared/components/notification/notification.service';
+import { AlertType } from '../../shared/components/alert.component';
 
 @Component({
   selector: 'app-monitoring-general',
@@ -61,6 +63,7 @@ import { CamelCaseToTitlePipe } from '../../shared/pipes/camel-case-to-title.pip
   `,
 })
 export class MonitoringGeneralComponent {
+  private notificationService = inject(NotificationService);
   private apiMonitoringService = inject(ApiMonitoringService);
   private monitoringEndpointService = inject(MonitoringEndpointService);
 
@@ -88,6 +91,13 @@ export class MonitoringGeneralComponent {
         );
         const { loggerDBTransportErrorLogs, ...otherData } = infoData;
         this.otherData.set(Object.entries(otherData));
+      },
+      error: (error) => {
+        console.error(error);
+        this.notificationService.show('Error getting general logs.', {
+          type: AlertType.red,
+          title: 'Error',
+        });
       },
     });
   }
