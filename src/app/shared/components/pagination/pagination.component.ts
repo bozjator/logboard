@@ -1,18 +1,16 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   OnChanges,
   SimpleChanges,
   signal,
   input,
-  output
+  output,
 } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
   templateUrl: './pagination.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
 })
 export class PaginationComponent implements OnChanges {

@@ -1,9 +1,4 @@
-import {
-  booleanAttribute,
-  ChangeDetectionStrategy,
-  Component,
-  input,
-} from '@angular/core';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export enum AlertType {
@@ -53,7 +48,6 @@ export enum AlertType {
       </div>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlertComponent {
   alertTypeEnum: any = AlertType;

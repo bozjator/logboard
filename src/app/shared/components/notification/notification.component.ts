@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  output,
-  viewChild,
-} from '@angular/core';
+import { Component, ElementRef, output, viewChild } from '@angular/core';
 import { AlertComponent, AlertType } from '../alert.component';
 
 @Component({
@@ -43,7 +37,6 @@ import { AlertComponent, AlertType } from '../alert.component';
     </div>
   `,
   imports: [AlertComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationComponent {
   title: string = 'Info';
